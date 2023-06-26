@@ -3,7 +3,10 @@ const {
   deleteNoteModel,
   createNoteModel,
   editNoteModel,
-  searchNoteModel
+  searchNoteModel,
+  getTrashNotesModel,
+  restoreNoteModel,
+  permanentDeleteNoteModel
 } = require("@models/models");
 
 
@@ -48,7 +51,7 @@ const editNoteController = async (req, res) => {
   const { id_notes } = req.params;
   try {
     const update = await editNoteModel(updatedNote, id_notes);
-    res.status(201).json({message: "berhasil di update", data: update });
+    res.status(201).json({message: "berhasil di update"});
   } catch (error) {
     console.error("Error : ", error);
     res.status(500).json({ error: "Kesalahan Server" });
@@ -66,10 +69,45 @@ const searchNoteController = async (req, res) => {
   }
 };
 
+const getTrashNotesController = async(req, res) => {
+  try {
+    const trash = await getTrashNotesModel();
+    res.status(200).json({data: trash});
+  } catch (error) {
+    console.error("Error : ", error);
+    res.status(500).json({error : "Kesalahan Server"});
+  }
+}
+
+const restoreNoteController = async (req, res) => {
+  const {id_notes} = req.params;
+  try {
+    const restore = await restoreNoteModel(id_notes);
+    res.status(201).json({message: "Berhasil di restore"});
+  } catch (error) {
+    console.error("Error : ", error);
+    res.status(500).json({error: "Kesalahan Server"});
+  }
+}
+
+const permanentDeleteNoteController = async (req, res) => {
+  const {id_notes} = req.params;
+  try {
+    const success = await permanentDeleteNoteModel(id_notes);
+    res.status(201).json({message: "Berhasil dihapus"});
+  } catch (error) {
+    console.error("Error : ", error);
+    res.status(500).json({error: "Kesalahan Server"});
+  }
+}
+
 module.exports = {
   getNotesController,
   deleteNoteController,
   createNoteController,
   editNoteController,
   searchNoteController,
+  getTrashNotesController,
+  restoreNoteController,
+  permanentDeleteNoteController
 };

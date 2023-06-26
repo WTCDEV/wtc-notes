@@ -1,5 +1,5 @@
 const db = require("@config/db");
-const { resume } = require("../../config/db");
+
 
 const getNotesModel = () => {
   return new Promise((resolve, reject) => {
@@ -97,4 +97,62 @@ const searchNoteModel = (titleNote) => {
   })
 }
 
-module.exports = { getNotesModel, deleteNoteModel, createNoteModel,  editNoteModel, searchNoteModel};
+const getTrashNotesModel = () => {
+  return new Promise((resolve, reject) => {
+    const query = "SELECT * FROM trash_notes";
+    db.query(query, (error, results) => {
+      if (error) {
+        console.error("Kesalahan query : ", error);
+        reject(new Error("Error"));
+      } else {
+        if (results.length === 0) {
+          reject(new Error("tidak ada sampah"));
+        } else {
+          resolve(results);
+        }
+      }
+    })
+  })
+}
+
+const restoreNoteModel = (id_notes) => {
+  return new Promise((resolve, reject) => {
+    const query = "INSERT INTO all_notes SELECT * FROM trash_notes WHERE id_notes = ?"; 
+    db.query(query, [id_notes], (error, results) => {
+      if (error) {
+        console.error("Kesalahan query : ", error);
+        reject(new Error("Error"));
+      } else {
+        if (results.affectedRows > 0) {
+          resolve(results);
+        } else {
+          reject(new Error("Gagal restore note"));
+        }
+      }
+    })
+  })
+}
+
+const permanentDeleteNoteModel = (id_notes) => {
+  return new Promise((resolve, reject) => {
+    const query = "DELETE FROM trash_notes WHERE id_notes = ?";
+    db.query(query, [id_notes], (error, results) => {
+      if (error) {
+        console.error("Kesalahan query : ", error);
+        reject(new Error("Error"));
+      } else {
+        if (results.affectedRows > 0) {
+          resolve(results);
+        } else {
+          reject(new Error("Gagal Delete Note"));
+        }
+      }
+    })
+  })
+}
+
+
+
+
+
+module.exports = { getNotesModel, deleteNoteModel, createNoteModel,  editNoteModel, searchNoteModel, getTrashNotesModel, restoreNoteModel, permanentDeleteNoteModel};
