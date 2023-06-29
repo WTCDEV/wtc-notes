@@ -1,5 +1,6 @@
 const db = require("@config/db");
 
+
 const getNotesModel = (id_user) => {
   return new Promise((resolve, reject) => {
     const query = "SELECT * FROM all_notes WHERE id_user = ?";
