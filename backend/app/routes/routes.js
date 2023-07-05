@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const {getNotesController, deleteNoteController, createNoteController, editNoteController, searchNoteController, getTrashNotesController, restoreNoteController, permanentDeleteNoteController, userLoginController, userRegisterController} = require("@controllers/controllers");
+const {getNotesController, deleteNoteController, createNoteController, editNoteController, searchNoteController, getTrashNotesController, restoreNoteController, permanentDeleteNoteController, userLoginController, userRegisterController, deleteUserController, updateUserController} = require("@controllers/controllers");
 
 router.get("/notes/:id_user", getNotesController);
 router.delete("/delete/:id_notes", deleteNoteController);
@@ -12,6 +12,8 @@ router.post("/restore-note/:id_notes", restoreNoteController);
 router.delete("/permanent-delete/:id_notes", permanentDeleteNoteController);
 router.post("/register-user", userRegisterController);
 router.get("/user-login", userLoginController);
+router.delete("/delete-user/:id_user", deleteUserController);
+router.put("/update-user/:id_user", updateUserController);
 
 
 module.exports = router;

@@ -10,10 +10,13 @@ const {
   userLoginModel,
   userRegisterModel,
   checkUsernameExist,
+  deleteUserModel,
+  updateUserModel,
 } = require("@models/models");
 
 const bcrypt = require("bcrypt");
 const { hashPassword } = require("../utils/bcrypt");
+const xss = require("xss");
 
 const getNotesController = async (req, res) => {
   const { id_user } = req.params;
@@ -42,7 +45,12 @@ const deleteNoteController = async (req, res) => {
 };
 
 const createNoteController = async (req, res) => {
-  const addNote = { id_user, title_note, text_note } = req.body;
+  const { id_user, title_note, text_note } = req.body;
+  const addNote = {
+    id_user,
+    title_note: xss(title_note),
+    text_note: xss(text_note),
+  };
   try {
     const note = await createNoteModel(addNote);
     res.status(201).json({ message: "Berhasil Ditambahkan" });
@@ -53,8 +61,12 @@ const createNoteController = async (req, res) => {
 };
 
 const editNoteController = async (req, res) => {
-  const updatedNote = { title_note, text_note } = req.body;
+  const { title_note, text_note } = req.body;
   const { id_notes } = req.params;
+  const updatedNote = {
+    title_note: xss(title_note),
+    text_note: xss(text_note),
+  };
   try {
     const update = await editNoteModel(updatedNote, id_notes);
     res.status(201).json({ message: "berhasil di update" });
@@ -65,7 +77,7 @@ const editNoteController = async (req, res) => {
 };
 
 const searchNoteController = async (req, res) => {
-  const { title_note } = req.params;
+  const title_note = xss(req.params.title_note);
   try {
     const search = await searchNoteModel(title_note);
     res.status(200).json({ data: search });
@@ -111,12 +123,14 @@ const userLoginController = async (req, res) => {
   const { username, password } = req.body;
 
   try {
-    const userData = await userLoginModel(username);
+    const Username = xss(username);
+    const Password = xss(password);
+    const userData = await userLoginModel(Username);
     if (userData.length === 0) {
       throw new Error("Akun Tidak Ditemukan");
     }
     const user = userData[0];
-    const passwordMatch = await bcrypt.compare(password, user.password);
+    const passwordMatch = await bcrypt.compare(Password, user.password);
     if (!passwordMatch) {
       throw new Error("Username atau Password Salah");
     }
@@ -130,14 +144,43 @@ const userLoginController = async (req, res) => {
 const userRegisterController = async (req, res) => {
   const { username, password } = req.body;
   try {
+    const Username = xss(username);
+    const Password = xss(password);
+
     const isUsernameExist = await checkUsernameExist(username);
     if (isUsernameExist) {
       throw new Error("Username Sudah Terdaftar");
     }
-    const hashedPassword = await hashPassword(password);
+    const hashedPassword = await hashPassword(Password);
     const createUser = { username, password: hashedPassword };
     await userRegisterModel(createUser);
     res.status(201).json({ message: "Register Suksess" });
+  } catch (error) {
+    console.error("Error : ", error);
+    res.status(500).json({ message: "Kesalahan Server" });
+  }
+};
+
+const deleteUserController = async (req, res) => {
+  const { id_user } = req.params;
+  try {
+    const success = await deleteUserModel(id_user);
+    res.status(201).json({ message: "Berhasil dihapus" });
+  } catch (error) {
+    console.error("Error : ", error);
+    res.status(500).json({ message: "Kesalahan Server" });
+  }
+};
+
+const updateUserController = async (req, res) => {
+  const { username } = req.body;
+  const { id_user } = req.params;
+  const updatedUser = {
+    username: xss(username),
+  };
+  try {
+    const updated = await updateUserModel(updatedUser, id_user);
+    res.status(201).json({ message: "Update suksess" });
   } catch (error) {
     console.error("Error : ", error);
     res.status(500).json({ message: "Kesalahan Server" });
@@ -155,4 +198,6 @@ module.exports = {
   permanentDeleteNoteController,
   userRegisterController,
   userLoginController,
+  deleteUserController,
+  updateUserController,
 };

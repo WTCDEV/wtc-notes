@@ -146,7 +146,7 @@ const permanentDeleteNoteModel = (id_notes) => {
         if (results.affectedRows > 0) {
           resolve(results);
         } else {
-          reject(new Error("Gagal Delete Note"));
+          reject(new Error("Note tidak ditemukan"));
         }
       }
     });
@@ -196,6 +196,42 @@ const checkUsernameExist = (username) => {
   });
 };
 
+const deleteUserModel = (id_user) => {
+  return new Promise((resolve, reject) => {
+    const query = "DELETE FROM users WHERE id_user = ?";
+    db.query(query, [id_user], (error, results) => {
+      if (error) {
+        console.error("Kesalahan query : ", error);
+        reject(new Error("Error"));
+      } else {
+        if (results.affectedRows > 0) {
+          resolve(results);
+        } else {
+          reject(new Error("Gagal Delete User"));
+        }
+      }
+    })
+  })
+}
+
+const updateUserModel = (updatedUser, id_user) => {
+  return new Promise((resolve, reject) => {
+    const query = "UPDATE users SET ? WHERE id_user = ?";
+    db.query(query, [updatedUser, id_user], (error, results) => {
+      if (error) {
+        console.error("Kesalhan query : ", error);
+        reject(new Error("Error"));
+      } else {
+        if (results.affectedRows > 0) {
+          resolve(results);
+        } else {
+          reject(new Error("Gagal update user"));
+        }
+      }
+    })
+  })
+}
+
 module.exports = {
   getNotesModel,
   deleteNoteModel,
@@ -208,4 +244,7 @@ module.exports = {
   userLoginModel,
   userRegisterModel,
   checkUsernameExist,
+  deleteNoteModel,
+  deleteUserModel,
+  updateUserModel,
 };
