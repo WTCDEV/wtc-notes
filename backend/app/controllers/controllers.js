@@ -127,19 +127,20 @@ const userLoginController = async (req, res) => {
     const Password = xss(password);
     const userData = await userLoginModel(Username);
     if (userData.length === 0) {
-      throw new Error("Akun Tidak Ditemukan");
+      return res.status(500).json({ message: "Akun tidak ditemukan" });
     }
     const user = userData[0];
     const passwordMatch = await bcrypt.compare(Password, user.password);
     if (!passwordMatch) {
       throw new Error("Username atau Password Salah");
     }
-    res.status(200).json({ message: "Login Berhasil" });
+    res.status(200).json({ message: "Login Berhasil", id_user: user.id_user, username: user.username, email: user.email});
   } catch (error) {
     console.error("Error:", error);
     res.status(500).json({ error: "Kesalahan Server" });
   }
 };
+
 
 const userRegisterController = async (req, res) => {
   const { username, password } = req.body;

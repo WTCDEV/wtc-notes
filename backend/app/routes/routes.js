@@ -11,7 +11,7 @@ router.get("/trash-notes", getTrashNotesController);
 router.post("/restore-note/:id_notes", restoreNoteController);
 router.delete("/permanent-delete/:id_notes", permanentDeleteNoteController);
 router.post("/register-user", userRegisterController);
-router.get("/user-login", userLoginController);
+router.post("/user-login", userLoginController);
 router.delete("/delete-user/:id_user", deleteUserController);
 router.put("/update-user/:id_user", updateUserController);
 

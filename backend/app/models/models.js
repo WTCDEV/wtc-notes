@@ -1,19 +1,15 @@
 const db = require("@config/db");
 
-
 const getNotesModel = (id_user) => {
   return new Promise((resolve, reject) => {
     const query = "SELECT * FROM all_notes WHERE id_user = ?";
+    const message = "tidak ada catatan";
     db.query(query, [id_user], (error, results) => {
       if (error) {
         console.error("Kesalahan query: ", error);
         reject(new Error("Error"));
       } else {
-        if (results.length === 0) {
-          reject(new Error("tidak ada catatan"));
-        } else {
-          resolve(results);
-        }
+        resolve(results);
       }
     });
   });
@@ -82,6 +78,7 @@ const editNoteModel = (updatedNote, id_notes) => {
 const searchNoteModel = (titleNote) => {
   return new Promise((resolve, reject) => {
     const query = "SELECT * FROM all_notes WHERE title_note LIKE ?";
+    const message = "Note Tidak Ditemukan";
     const searchKeyword = `%${titleNote}%`;
     db.query(query, [searchKeyword], (error, results) => {
       if (error) {
@@ -89,7 +86,7 @@ const searchNoteModel = (titleNote) => {
         reject(new Error("Error"));
       } else {
         if (results.length === 0) {
-          reject(new Error("Note Tidak Ditemukan"));
+          resolve(message);
         } else {
           resolve(results);
         }
@@ -101,13 +98,14 @@ const searchNoteModel = (titleNote) => {
 const getTrashNotesModel = () => {
   return new Promise((resolve, reject) => {
     const query = "SELECT * FROM trash_notes";
+    const message = "Tidak ada sampah";
     db.query(query, (error, results) => {
       if (error) {
         console.error("Kesalahan query : ", error);
         reject(new Error("Error"));
       } else {
         if (results.length === 0) {
-          reject(new Error("tidak ada sampah"));
+          resolve(message);
         } else {
           resolve(results);
         }
@@ -210,9 +208,9 @@ const deleteUserModel = (id_user) => {
           reject(new Error("Gagal Delete User"));
         }
       }
-    })
-  })
-}
+    });
+  });
+};
 
 const updateUserModel = (updatedUser, id_user) => {
   return new Promise((resolve, reject) => {
@@ -228,9 +226,9 @@ const updateUserModel = (updatedUser, id_user) => {
           reject(new Error("Gagal update user"));
         }
       }
-    })
-  })
-}
+    });
+  });
+};
 
 module.exports = {
   getNotesModel,
