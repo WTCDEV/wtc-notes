@@ -3,7 +3,6 @@ import 'package:frontend/controllers/note_controller.dart';
 import 'package:frontend/models/note_model.dart';
 import 'package:frontend/views/confirm_delete_trash.dart';
 import 'package:frontend/views/detail_trash_view.dart';
-
 import 'package:intl/intl.dart';
 
 class TrashListWidget extends StatefulWidget {
@@ -105,6 +104,7 @@ class _TrashListWidgetState extends State<TrashListWidget> {
                       ),
                     );
                   },
+                  
                 )
               ],
             ),

@@ -89,7 +89,7 @@ class _HomePageState extends State<HomePage> {
                   route: '/add-note',
                 ),
                 ItemDashboard(
-                  title: 'Trash Note',
+                  title: 'Trash Notes',
                   iconData: Icons.delete,
                   background: Colors.blue,
                   route: '/trash',
@@ -99,11 +99,23 @@ class _HomePageState extends State<HomePage> {
                     Navigator.pushNamedAndRemoveUntil(
                         context, '/login', (route) => false);
                   },
-                  icon: const Icon(
-                    Icons.arrow_forward,
-                    size: 24.0,
+                  icon: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.arrow_forward,
+                        size: 24.0,
+                      ),
+                      SizedBox(height: 10,),
+                      Text(
+                        "Sign Out",
+                        style: TextStyle(fontSize: 16.0),
+                      ),
+                    ],
                   ),
-                ),
+                )
+
               ],
             ),
           ),

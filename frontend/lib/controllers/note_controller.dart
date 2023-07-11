@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:frontend/models/note_model.dart';
 import 'package:frontend/shared/shared_preferences.dart';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
+
 
 class NoteController {
   static const String baseUrl = 'http://localhost:3000';
@@ -61,16 +61,14 @@ class NoteController {
       final response = await http.get(url, headers: headers);
       final jsonData = json.decode(response.body)['data'] as List<dynamic>;
 
-      if (jsonData != null) {
+
         List<NotesModel> notesList = [];
         for (var item in jsonData) {
           NotesModel note = NotesModel.fromJson(item);
           notesList.add(note);
         }
         return notesList;
-      } else {
-        return [];
-      }
+
     } catch (e) {
       throw e;
     }
@@ -85,16 +83,14 @@ class NoteController {
       final response = await http.get(url, headers: headers);
       final jsonData = json.decode(response.body)['data'] as List<dynamic>;
 
-      if (jsonData != null) {
+
         List<TrashModel> trashList = [];
         for (var item in jsonData) {
           TrashModel trash = TrashModel.fromJson(item);
           trashList.add(trash);
         }
         return trashList;
-      } else {
-        return [];
-      }
+
     } catch (e) {
       throw e;
     }
