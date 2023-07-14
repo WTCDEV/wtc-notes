@@ -16,8 +16,6 @@ class _AddNoteWidgetState extends State<AddNoteWidget> {
   final NoteController _noteController = NoteController();
   int? idUser;
 
-
-
   @override
   void initState() {
     super.initState();
@@ -43,7 +41,6 @@ class _AddNoteWidgetState extends State<AddNoteWidget> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
         title: const Text("Add Note"),
@@ -72,7 +69,6 @@ class _AddNoteWidgetState extends State<AddNoteWidget> {
               const SizedBox(height: 20.0),
               ElevatedButton(
                 onPressed: () {
-                  // Action when the "Save" button is pressed
                   final title = _titleController.text;
                   final text = _textController.text;
 
@@ -83,11 +79,25 @@ class _AddNoteWidgetState extends State<AddNoteWidget> {
                   );
 
                   _noteController.addNote(note).then((_) {
+                     ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text("Berhasil ditambah!"),
+                        duration: Duration(seconds: 2),
+                      ),
+                    );
+
                     Navigator.pushNamedAndRemoveUntil(
                       context,
                       '/home',
                       (route) => route.isFirst,
-                    ); // Navigate back to the home screen (NotesView) and remove all routes above it
+                    );
+                  }).catchError((error) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text("Gagal ditambah!"),
+                        duration: Duration(seconds: 2),
+                      ),
+                    );
                   });
                 },
                 child: const Text('Save'),

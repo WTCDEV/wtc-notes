@@ -3,7 +3,6 @@ import 'package:frontend/models/note_model.dart';
 import 'package:frontend/shared/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
-
 class NoteController {
   static const String baseUrl = 'http://localhost:3000';
   static const String addNoteEndPoint = '/create-note';
@@ -61,14 +60,12 @@ class NoteController {
       final response = await http.get(url, headers: headers);
       final jsonData = json.decode(response.body)['data'] as List<dynamic>;
 
-
-        List<NotesModel> notesList = [];
-        for (var item in jsonData) {
-          NotesModel note = NotesModel.fromJson(item);
-          notesList.add(note);
-        }
-        return notesList;
-
+      List<NotesModel> notesList = [];
+      for (var item in jsonData) {
+        NotesModel note = NotesModel.fromJson(item);
+        notesList.add(note);
+      }
+      return notesList;
     } catch (e) {
       throw e;
     }
@@ -83,14 +80,12 @@ class NoteController {
       final response = await http.get(url, headers: headers);
       final jsonData = json.decode(response.body)['data'] as List<dynamic>;
 
-
-        List<TrashModel> trashList = [];
-        for (var item in jsonData) {
-          TrashModel trash = TrashModel.fromJson(item);
-          trashList.add(trash);
-        }
-        return trashList;
-
+      List<TrashModel> trashList = [];
+      for (var item in jsonData) {
+        TrashModel trash = TrashModel.fromJson(item);
+        trashList.add(trash);
+      }
+      return trashList;
     } catch (e) {
       throw e;
     }

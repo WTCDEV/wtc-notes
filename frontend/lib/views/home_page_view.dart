@@ -49,6 +49,7 @@ class _HomePageState extends State<HomePage> {
                       .headlineSmall
                       ?.copyWith(color: Colors.white),
                 ),
+
                 trailing: const CircleAvatar(
                   radius: 30,
                   backgroundImage: AssetImage('assets/iconbocchi.jpg'),

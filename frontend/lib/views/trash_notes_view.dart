@@ -13,6 +13,7 @@ class TrashListWidget extends StatefulWidget {
 class _TrashListWidgetState extends State<TrashListWidget> {
   final NoteController controller = NoteController();
   List<TrashModel> trashList = [];
+  bool isLoading = true; // Track if data is being loaded
 
   @override
   void initState() {
@@ -23,11 +24,16 @@ class _TrashListWidgetState extends State<TrashListWidget> {
   Future<void> fetchTrash() async {
     try {
       List<TrashModel> fetchedTrash = await controller.fetchTrash();
+      await Future.delayed(Duration(seconds: 2));
       setState(() {
         trashList = fetchedTrash;
+        isLoading = false;
       });
     } catch (error) {
       print(error);
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
@@ -36,9 +42,13 @@ class _TrashListWidgetState extends State<TrashListWidget> {
       List<TrashModel> fetchedTrash = await controller.fetchTrash();
       setState(() {
         trashList = fetchedTrash;
+        isLoading = false;
       });
     } catch (error) {
       print(error);
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
@@ -48,75 +58,82 @@ class _TrashListWidgetState extends State<TrashListWidget> {
       appBar: AppBar(
         title: Text('Trash List'),
       ),
-      body: ListView.separated(
-        itemCount: trashList.length,
-        separatorBuilder: (context, index) => Divider(
-          color: Colors.grey,
-        ),
-        itemBuilder: (context, index) {
-          TrashModel trash = trashList[index];
-          String formattedDate = trash.date_note != null
-              ? DateFormat.yMMMd().format(trash.date_note!)
-              : '';
-
-          return ListTile(
-            title: Text(
-              trash.title_note ?? '',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  trash.text_note ?? '',
-                  style: TextStyle(
-                    fontSize: 14,
-                  ),
-                ),
-                SizedBox(height: 4),
-                Text(
-                  'Date: $formattedDate',
-                  style: TextStyle(
-                    fontSize: 12,
+      body: isLoading
+          ? Center(
+              child: CircularProgressIndicator(),
+            )
+          : trashList.isEmpty
+              ? Center(
+                  child: Text('Trash Empty'),
+                )
+              : ListView.separated(
+                  itemCount: trashList.length,
+                  separatorBuilder: (context, index) => Divider(
                     color: Colors.grey,
                   ),
-                ),
-              ],
-            ),
-            trailing: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                
-                IconButton(
-                  icon: Icon(Icons.delete),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ConfirmDeleteTrash(
-                          trash: trash,
-                          refreshCallback: refreshTrash,
+                  itemBuilder: (context, index) {
+                    TrashModel trash = trashList[index];
+                    String formattedDate =
+                        DateFormat.yMMMd().format(trash.date_note!);
+                    return ListTile(
+                      title: Text(
+                        trash.title_note ?? '',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            trash.text_note ?? '',
+                            style: TextStyle(
+                              fontSize: 14,
+                            ),
+                          ),
+                          SizedBox(height: 4),
+                          Text(
+                            'Date: $formattedDate',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ],
+                      ),
+                      trailing: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon: Icon(Icons.delete),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ConfirmDeleteTrash(
+                                    trash: trash,
+                                    refreshCallback: refreshTrash,
+                                  ),
+                                ),
+                              );
+                            },
+                            tooltip: "Delete",
+                          )
+                        ],
+                      ),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => DetailTrash(trash: trash),
+                          ),
+                        );
+                      },
                     );
                   },
-                  
-                )
-              ],
-            ),
-            onTap: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => DetailTrash(trash: trash)));
-            },
-          );
-        },
-      ),
+                ),
     );
   }
 }

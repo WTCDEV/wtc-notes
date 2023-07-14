@@ -30,7 +30,6 @@ class MyApp extends StatelessWidget {
         '/trash': (context) => TrashListWidget(),
         '/add-note': (context) => AddNoteWidget(),
       },
-
     );
   }
 }

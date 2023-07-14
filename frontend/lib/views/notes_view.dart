@@ -116,6 +116,7 @@ class _NoteListWidgetState extends State<NoteListWidget> {
                                 );
                               },
                               icon: Icon(Icons.edit),
+                              tooltip: "Edit",
                             ),
                             IconButton(
                               icon: Icon(Icons.delete),
@@ -130,6 +131,7 @@ class _NoteListWidgetState extends State<NoteListWidget> {
                                   ),
                                 );
                               },
+                              tooltip: "Delete",
                             )
                           ],
                         ),

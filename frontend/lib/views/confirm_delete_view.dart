@@ -18,7 +18,7 @@ class ConfirmDelete extends StatelessWidget {
       actions: [
         TextButton(
           onPressed: () {
-            Navigator.pop(context); // Close the dialog
+            Navigator.pop(context);
           },
           child: Text('Cancel'),
         ),
@@ -26,7 +26,14 @@ class ConfirmDelete extends StatelessWidget {
           onPressed: () async {
             await NoteController().deleteNote(note.id_notes!);
             refreshCallback();
-            Navigator.pop(context, true); // Return true to indicate deletion
+            Navigator.pop(context, true);
+
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text("Berhasil dihapus"),
+                duration: Duration(seconds: 2),
+              ),
+            );
           },
           child: Text('Delete'),
         ),

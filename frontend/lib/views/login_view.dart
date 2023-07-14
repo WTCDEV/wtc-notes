@@ -134,7 +134,7 @@ class _LoginViewState extends State<LoginView> {
 
       if (response['message'] == 'Login Berhasil') {
         await SharedPrefUtils.saveUserData(
-            response['username'], response['email'] ?? '');
+            response['username']);
         await SharedPrefUtils.saveIdUser(response['id_user']);
 
 

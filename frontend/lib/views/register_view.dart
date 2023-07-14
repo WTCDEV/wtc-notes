@@ -144,12 +144,11 @@ class _RegisterViewState extends State<RegisterView> {
       await _userController.registerUser(
         UserRegisterModel(
           username: _username,
-          email: _email,
           password: _password,
         ),
       );
 
-      await SharedPrefUtils.saveUserData(_username, _email);
+      await SharedPrefUtils.saveUserData(_username);
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -158,14 +157,10 @@ class _RegisterViewState extends State<RegisterView> {
         ),
       );
 
-      // Menunda perpindahan ke halaman login selama 2 detik
       await Future.delayed(const Duration(seconds: 2));
 
-
-      // Berpindah ke halaman login
       Navigator.pushReplacementNamed(context, '/login');
     } catch (e) {
-      // Menampilkan snackbar pesan kesalahan
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Login gagal'),

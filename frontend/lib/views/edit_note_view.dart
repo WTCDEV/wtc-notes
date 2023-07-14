@@ -44,23 +44,19 @@ class _EditNoteWidgetState extends State<EditNoteWidget> {
 
     try {
       await controller.editNote(updatedNote, widget.note.id_notes);
-      widget.refreshCallback(); // Panggil fungsi refresh dari NoteListWidget
-      Navigator.pop(context); // Kembali ke halaman sebelumnya
+      widget.refreshCallback();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Berhasil diupdate"),
+          duration: Duration(seconds: 2),
+        ),
+      );
+      Navigator.pop(context);
     } catch (error) {
-      print('Failed to update note: $error');
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text('Failed to update note'),
-          content: Text('An error occurred while updating the note.'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context); // Tutup dialog
-              },
-              child: Text('OK'),
-            ),
-          ],
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Gagal diupdate"),
+          duration: Duration(seconds: 2),
         ),
       );
     }
