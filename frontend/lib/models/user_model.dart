@@ -3,12 +3,11 @@ class UserRegisterModel {
   String? email;
   String? password;
 
-  UserRegisterModel({this.username, this.email, this.password});
+  UserRegisterModel({this.username, this.password});
 
   Map<String, dynamic> toJson() {
     return {
       'username': username,
-      'email': email,
       'password': password,
     };
   }

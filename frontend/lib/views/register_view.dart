@@ -15,7 +15,6 @@ class _RegisterViewState extends State<RegisterView> {
   final _formKey = GlobalKey<FormState>();
 
   late String _username;
-  late String _email;
   late String _password;
 
   @override
@@ -68,21 +67,7 @@ class _RegisterViewState extends State<RegisterView> {
                     _username = value!;
                   },
                 ),
-                const SizedBox(height: 10.0),
-                TextFormField(
-                  decoration: const InputDecoration(
-                    labelText: 'Email',
-                  ),
-                  validator: (value) {
-                    if (value!.isEmpty) {
-                      return 'Masukkan Username';
-                    }
-                    return null;
-                  },
-                  onSaved: (value) {
-                    _email = value!;
-                  },
-                ),
+                
                 const SizedBox(height: 10.0),
                 TextFormField(
                   decoration: const InputDecoration(

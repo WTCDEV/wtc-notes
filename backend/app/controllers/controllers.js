@@ -61,9 +61,10 @@ const createNoteController = async (req, res) => {
 };
 
 const editNoteController = async (req, res) => {
-  const { title_note, text_note } = req.body;
+  const { id_user, title_note, text_note } = req.body;
   const { id_notes } = req.params;
   const updatedNote = {
+    id_user: xss(id_user),
     title_note: xss(title_note),
     text_note: xss(text_note),
   };
@@ -88,8 +89,9 @@ const searchNoteController = async (req, res) => {
 };
 
 const getTrashNotesController = async (req, res) => {
+  const {id_user} = req.params;
   try {
-    const trash = await getTrashNotesModel();
+    const trash = await getTrashNotesModel(id_user);
     res.status(200).json({ data: trash });
   } catch (error) {
     console.error("Error : ", error);
@@ -112,7 +114,7 @@ const permanentDeleteNoteController = async (req, res) => {
   const { id_notes } = req.params;
   try {
     const success = await permanentDeleteNoteModel(id_notes);
-    res.status(201).json({ message: "Berhasil dihapus" });
+    res.status(200).json({ message: "Berhasil dihapus" });
   } catch (error) {
     console.error("Error : ", error);
     res.status(500).json({ error: "Kesalahan Server" });
@@ -146,14 +148,12 @@ const userRegisterController = async (req, res) => {
   const { username, password } = req.body;
   try {
     const Username = xss(username);
-    const Password = xss(password);
-
-    const isUsernameExist = await checkUsernameExist(username);
+    const isUsernameExist = await checkUsernameExist(Username);
     if (isUsernameExist) {
       throw new Error("Username Sudah Terdaftar");
     }
-    const hashedPassword = await hashPassword(Password);
-    const createUser = { username, password: hashedPassword };
+    const hashedPassword = await hashPassword(password);
+    const createUser = { Username, password: hashedPassword };
     await userRegisterModel(createUser);
     res.status(201).json({ message: "Register Suksess" });
   } catch (error) {

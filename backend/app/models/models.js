@@ -95,11 +95,11 @@ const searchNoteModel = (titleNote) => {
   });
 };
 
-const getTrashNotesModel = () => {
+const getTrashNotesModel = (id_user) => {
   return new Promise((resolve, reject) => {
-    const query = "SELECT * FROM trash_notes";
+    const query = "SELECT * FROM trash_notes WHERE id_user = ?";
     const message = "Tidak ada sampah";
-    db.query(query, (error, results) => {
+    db.query(query, [id_user], (error, results) => {
       if (error) {
         console.error("Kesalahan query : ", error);
         reject(new Error("Error"));
