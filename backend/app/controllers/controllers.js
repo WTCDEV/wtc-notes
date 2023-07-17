@@ -12,11 +12,18 @@ const {
   checkUsernameExist,
   deleteUserModel,
   updateUserModel,
+  getUserByEmailModel,
+  saveResetTokenModel,
+  getUserByResetToken,
+  resetUserPassword,
 } = require("@models/models");
 
 const bcrypt = require("bcrypt");
 const { hashPassword } = require("../utils/bcrypt");
 const xss = require("xss");
+const nodemailer = require("nodemailer");
+const { v4: uuidv4 } = require('uuid');
+require('dotenv').config();
 
 const getNotesController = async (req, res) => {
   const { id_user } = req.params;
@@ -129,7 +136,7 @@ const userLoginController = async (req, res) => {
     const Password = xss(password);
     const userData = await userLoginModel(Username);
     if (userData.length === 0) {
-      return res.status(500).json({ message: "Akun tidak ditemukan" });
+      return res.status(500).json({ message: "Akun tidak ditemukan!" });
     }
     const user = userData[0];
     const passwordMatch = await bcrypt.compare(Password, user.password);
@@ -145,15 +152,17 @@ const userLoginController = async (req, res) => {
 
 
 const userRegisterController = async (req, res) => {
-  const { username, password } = req.body;
+  const { username, email, password } = req.body;
   try {
     const Username = xss(username);
+    const Email = xss(email);
+
     const isUsernameExist = await checkUsernameExist(Username);
     if (isUsernameExist) {
       throw new Error("Username Sudah Terdaftar");
     }
     const hashedPassword = await hashPassword(password);
-    const createUser = { Username, password: hashedPassword };
+    const createUser = { Username, Email, password: hashedPassword };
     await userRegisterModel(createUser);
     res.status(201).json({ message: "Register Suksess" });
   } catch (error) {
@@ -188,6 +197,116 @@ const updateUserController = async (req, res) => {
   }
 };
 
+
+const transporter = nodemailer.createTransport({
+  service: "Gmail",
+  auth: {
+    user: process.env.EMAIL,
+    pass: process.env.PASSWORD,
+  },
+});
+
+const sendResetPasswordEmail = (email, resetToken) => {
+  const mailOptions = {
+    from: process.env.EMAIL,
+    to: email,
+    subject: "Reset Password",
+    text: `token reset password anda ${resetToken}`
+  };
+  transporter.sendMail(mailOptions, (err, info) => {
+    if (err) {
+      console.log("kesalahan pengiriman email : ", err);
+    } else {
+      console.log("berhasil kirim ", info.response);
+    }
+  });
+}
+
+const sendUsernameUser = (email, username) => {
+  const mailOptions = {
+    from: process.env.EMAIL,
+    to: email,
+    subject: "Your USERNAME",
+    text: `username anda adalah "${username}"`
+  };
+  transporter.sendMail(mailOptions, (err, info) => {
+    if (err) {
+      console.log("Kesalahan pengiriman email: : ", err);
+    } else {console.log("berhasil kirim ", info.response);
+      
+    }
+  })
+}
+
+const forgotUsernameController = async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    const user = await getUserByEmailModel(email);
+    if (!user) {
+      return res.status(404).json({ error: "Email tidak terdaftar" });
+    }
+    sendUsernameUser(email, user[0].username);
+    res.status(200).json({message: "berhasil kirim username"})
+  } catch (error) {
+    res.status(500).json({ error: error });
+    throw new Error("Error", error);
+  }
+}
+
+
+const generateToken = () => {
+  const token = uuidv4();
+  return token;
+}
+
+
+const forgotPasswordController = async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    const user = await getUserByEmailModel(email);
+    if (!user) {
+      return res.status(404).json({ error: "Email tidak terdaftar" });
+    }
+
+    const resetToken = generateToken();
+    await saveResetTokenModel(user[0].id_user, resetToken);
+
+    sendResetPasswordEmail(email, resetToken);
+
+    res.status(200).json({ message: "Token reset password telah dikirim" });
+  } catch (error) {
+    console.error("Error : ", error);
+    res.status(500).json({ error: "Kesalahan Server" });
+  }
+}
+
+const checkResetToken = async (reset_token) => {
+  try {
+    const user = await getUserByResetToken(reset_token);
+    if (!user) {
+      throw new Error("Token tidak valid");
+    }
+    return user;
+  } catch (error) {
+    throw new Error("Token tidak valid");
+  }
+};
+
+const resetPasswordWithResetToken = async (req, res) => {
+  const { resetToken, password } = req.body;
+  const user = await checkResetToken(resetToken);
+
+  try {
+    const hashedPassword = await hashPassword(password);
+    await resetUserPassword(user[0].id_user, hashedPassword);
+    res.status(200).json({ message: "suksess update password"});
+  } catch (error) {
+    res.status(500).json({ error: "Kesalahan Server"});
+  }
+}
+
 module.exports = {
   getNotesController,
   deleteNoteController,
@@ -201,4 +320,7 @@ module.exports = {
   userLoginController,
   deleteUserController,
   updateUserController,
+  forgotPasswordController,
+  resetPasswordWithResetToken,
+  forgotUsernameController,
 };

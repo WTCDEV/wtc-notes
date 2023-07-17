@@ -230,7 +230,68 @@ const updateUserModel = (updatedUser, id_user) => {
   });
 };
 
+const getUserByEmailModel = (email) => {
+  return new Promise((resolve, reject) => {
+    const query = "SELECT * FROM users WHERE email = ?";
+    db.query(query, [email], (error, results) => {
+      if (error) {
+        console.error("Kesalahan query : ", error);
+        reject(new Error("Error"));
+      } else {
+        resolve(results);
+      }
+    });
+  })
+}
+
+const saveResetTokenModel = (id_user, resetToken) => {
+  return new Promise((resolve, reject) => {
+    const query = "UPDATE users SET reset_token = ? WHERE id_user = ?";
+    db.query(query, [resetToken, id_user], (error, results) => {
+      if (error) {
+        console.error("Error : ", error);
+        reject(new Error("Error"));
+      } else {
+        resolve(results);
+      }
+    })
+  })
+}
+
+const getUserByResetToken = (resetToken) => {
+  return new Promise((resolve, reject) => {
+    const query = "SELECT * FROM users WHERE reset_token = ?";
+    db.query(query, [resetToken], (error, results) => {
+      if (error) {
+        console.error("Error : ", error);
+        reject(new Error("Error"));
+      } else {
+        if (results === 0) {
+          reject(new Error("token tidak valid"));
+        } else {
+          resolve(results);
+        }
+      }
+    });
+  })
+}
+
+const resetUserPassword = (id_user, password) => {
+  return new Promise((resolve, reject) => {
+    const query = "UPDATE users SET password = ? WHERE id_user = ?";
+    db.query(query, [password, id_user], (error, results) => {
+      if (error) {
+        console.error("Error : ", error);
+        reject(new Error("Error"));
+      } else {
+        resolve(results);
+      }
+    })
+  })
+}
+
 module.exports = {
+  getUserByResetToken,
   getNotesModel,
   deleteNoteModel,
   createNoteModel,
@@ -245,4 +306,7 @@ module.exports = {
   deleteNoteModel,
   deleteUserModel,
   updateUserModel,
+  getUserByEmailModel,
+  saveResetTokenModel,
+  resetUserPassword,
 };

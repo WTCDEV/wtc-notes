@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const {getNotesController, deleteNoteController, createNoteController, editNoteController, searchNoteController, getTrashNotesController, restoreNoteController, permanentDeleteNoteController, userLoginController, userRegisterController, deleteUserController, updateUserController} = require("@controllers/controllers");
+const {getNotesController, deleteNoteController, createNoteController, editNoteController, searchNoteController, getTrashNotesController, restoreNoteController, permanentDeleteNoteController, userLoginController, userRegisterController, deleteUserController, updateUserController, forgotPasswordController, forgotUsernameController, resetPasswordWithResetToken} = require("@controllers/controllers");
 
 router.get("/notes/:id_user", getNotesController);
 router.delete("/delete/:id_notes", deleteNoteController);
@@ -14,6 +14,10 @@ router.post("/register-user", userRegisterController);
 router.post("/user-login", userLoginController);
 router.delete("/delete-user/:id_user", deleteUserController);
 router.put("/update-user/:id_user", updateUserController);
+router.post("/forgot-password", forgotPasswordController);
+router.post("/forgot-username", forgotUsernameController);
+router.put("/reset-password", resetPasswordWithResetToken);
+
 
 
 module.exports = router;
