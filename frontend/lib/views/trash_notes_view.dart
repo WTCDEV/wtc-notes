@@ -12,43 +12,13 @@ class TrashListWidget extends StatefulWidget {
 
 class _TrashListWidgetState extends State<TrashListWidget> {
   final NoteController controller = NoteController();
-  List<TrashModel> trashList = [];
-  bool isLoading = true; // Track if data is being loaded
 
-  @override
-  void initState() {
-    super.initState();
-    fetchTrash();
-  }
-
-  Future<void> fetchTrash() async {
+  Future<List<TrashModel>> fetchTrash() async {
     try {
-      List<TrashModel> fetchedTrash = await controller.fetchTrash();
-      await Future.delayed(Duration(seconds: 2));
-      setState(() {
-        trashList = fetchedTrash;
-        isLoading = false;
-      });
+      return await controller.fetchTrash();
     } catch (error) {
       print(error);
-      setState(() {
-        isLoading = false;
-      });
-    }
-  }
-
-  Future<void> refreshTrash() async {
-    try {
-      List<TrashModel> fetchedTrash = await controller.fetchTrash();
-      setState(() {
-        trashList = fetchedTrash;
-        isLoading = false;
-      });
-    } catch (error) {
-      print(error);
-      setState(() {
-        isLoading = false;
-      });
+      return [];
     }
   }
 
@@ -58,82 +28,99 @@ class _TrashListWidgetState extends State<TrashListWidget> {
       appBar: AppBar(
         title: Text('Trash List'),
       ),
-      body: isLoading
-          ? Center(
+      body: FutureBuilder<List<TrashModel>>(
+        future: fetchTrash(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(
               child: CircularProgressIndicator(),
-            )
-          : trashList.isEmpty
-              ? Center(
-                  child: Text('Trash Empty'),
-                )
-              : ListView.separated(
-                  itemCount: trashList.length,
-                  separatorBuilder: (context, index) => Divider(
-                    color: Colors.grey,
+            );
+          } else if (snapshot.hasError) {
+            return Center(
+              child: Text('Error'),
+            );
+          } else {
+            List<TrashModel> trashList = snapshot.data ?? [];
+
+            if (trashList.isEmpty) {
+              return Center(
+                child: Text('Trash Empty'),
+              );
+            }
+
+            return ListView.separated(
+              itemCount: trashList.length,
+              separatorBuilder: (context, index) => Divider(
+                color: Colors.grey,
+              ),
+              itemBuilder: (context, index) {
+                TrashModel trash = trashList[index];
+                String formattedDate =
+                    DateFormat.yMMMd().format(trash.date_note!);
+                return ListTile(
+                  title: Text(
+                    trash.title_note ?? '',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                  itemBuilder: (context, index) {
-                    TrashModel trash = trashList[index];
-                    String formattedDate =
-                        DateFormat.yMMMd().format(trash.date_note!);
-                    return ListTile(
-                      title: Text(
-                        trash.title_note ?? '',
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        trash.text_note ?? '',
                         style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
                         ),
                       ),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            trash.text_note ?? '',
-                            style: TextStyle(
-                              fontSize: 14,
-                            ),
-                          ),
-                          SizedBox(height: 4),
-                          Text(
-                            'Date: $formattedDate',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey,
-                            ),
-                          ),
-                        ],
+                      SizedBox(height: 4),
+                      Text(
+                        'Date: $formattedDate',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey,
+                        ),
                       ),
-                      trailing: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          IconButton(
-                            icon: Icon(Icons.delete),
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => ConfirmDeleteTrash(
-                                    trash: trash,
-                                    refreshCallback: refreshTrash,
-                                  ),
-                                ),
-                              );
-                            },
-                            tooltip: "Delete",
-                          )
-                        ],
+                    ],
+                  ),
+                  trailing: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: Icon(Icons.delete),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ConfirmDeleteTrash(
+                                trash: trash,
+                                refreshCallback: () {
+                                  setState(() {});
+                                },
+                              ),
+                            ),
+                          );
+                        },
+                        tooltip: "Delete",
+                      )
+                    ],
+                  ),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => DetailTrash(trash: trash),
                       ),
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => DetailTrash(trash: trash),
-                          ),
-                        );
-                      },
                     );
                   },
-                ),
+                );
+              },
+            );
+          }
+        },
+      ),
     );
   }
 }

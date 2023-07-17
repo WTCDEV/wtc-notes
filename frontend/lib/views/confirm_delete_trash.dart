@@ -25,7 +25,6 @@ class ConfirmDeleteTrash extends StatelessWidget {
         TextButton(
           onPressed: () async {
             await NoteController().deleteTrash(trash.id_notes!);
-            refreshCallback();
             Navigator.pop(context, true);
 
             ScaffoldMessenger.of(context).showSnackBar(
@@ -34,6 +33,7 @@ class ConfirmDeleteTrash extends StatelessWidget {
                 duration: Duration(seconds: 2),
               ),
             );
+            refreshCallback();
           },
 
           child: Text('Delete'),

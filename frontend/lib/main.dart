@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/shared/shared_preferences.dart';
 import 'package:frontend/views/add_note_view.dart';
 import 'package:frontend/views/notes_view.dart';
 
@@ -8,11 +9,23 @@ import 'package:frontend/views/home_page_view.dart';
 import 'package:frontend/views/splash_screen.dart';
 import 'package:frontend/views/trash_notes_view.dart';
 
-void main() {
-  runApp(MyApp());
+import 'views/avatar.dart';
+import 'views/profil.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  final isLoggedIn = await SharedPrefUtils.readIsLoggedIn();
+  final initialRoute = isLoggedIn ?? false ? '/home' : '/';
+
+  runApp(MyApp(initialRoute: initialRoute));
 }
 
 class MyApp extends StatelessWidget {
+  final String initialRoute;
+
+  const MyApp({Key? key, required this.initialRoute}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -20,7 +33,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.indigo,
       ),
-      initialRoute: '/',
+      initialRoute: initialRoute,
       routes: {
         '/': (context) => const SplashScreen(),
         '/register': (context) => const RegisterView(),
@@ -29,6 +42,8 @@ class MyApp extends StatelessWidget {
         '/notes': (context) => NoteListWidget(),
         '/trash': (context) => TrashListWidget(),
         '/add-note': (context) => AddNoteWidget(),
+        '/addImage': (context) => ProfilePage(),
+        '/avatar': (context) => AvatarPage(),
       },
     );
   }

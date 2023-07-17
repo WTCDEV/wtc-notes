@@ -41,9 +41,9 @@ class NoteController {
       final response = await http.put(url, headers: headers, body: body);
 
       if (response.statusCode == 201) {
-        print('Note added successfully');
+        print('Note edit successfully');
       } else {
-        print('Failed to add note');
+        print('Failed to edit note');
       }
     } catch (e) {
       print('An error occurred: $e');

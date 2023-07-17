@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:frontend/controllers/user_controller.dart';
 import 'package:frontend/models/user_model.dart';
 import 'package:frontend/shared/shared_preferences.dart';
+import 'package:frontend/views/forgot_username_view.dart';
+
+import 'forgot.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({Key? key}) : super(key: key);
@@ -20,7 +23,6 @@ class _LoginViewState extends State<LoginView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 24),
         children: [
@@ -114,10 +116,32 @@ class _LoginViewState extends State<LoginView> {
             height: 10.0,
           ),
           TextButton(
-              onPressed: () {
-                Navigator.pushReplacementNamed(context, '/register');
-              },
-              child: Text("Not have account ? register!")),
+            onPressed: () {
+              Navigator.pushReplacementNamed(context, '/register');
+            },
+            child: Text("Not have account ? register!"),
+          ),
+          const SizedBox(
+            height: 10.0,
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ForgotPage()),
+              );
+            },
+            child: Text("Forgot Password?"),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ForgotUsernamPage()),
+              );
+            },
+            child: Text("Forgot Username?"),
+          ),
         ],
       ),
     );
@@ -134,9 +158,9 @@ class _LoginViewState extends State<LoginView> {
 
       if (response['message'] == 'Login Berhasil') {
         await SharedPrefUtils.saveUserData(
-            response['username']);
+            response['username'], response['email']);
         await SharedPrefUtils.saveIdUser(response['id_user']);
-
+        await SharedPrefUtils.saveIsLoggedIn(true);
 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -146,7 +170,7 @@ class _LoginViewState extends State<LoginView> {
         );
 
         await Future.delayed(const Duration(seconds: 2));
-        Navigator.pushReplacementNamed(context, '/home');
+        Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -156,6 +180,7 @@ class _LoginViewState extends State<LoginView> {
         );
       }
     } catch (e) {
+      print(e);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Terjadi kesalahan saat login'),

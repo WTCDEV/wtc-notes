@@ -15,12 +15,12 @@ class _RegisterViewState extends State<RegisterView> {
   final _formKey = GlobalKey<FormState>();
 
   late String _username;
+  late String _email;
   late String _password;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 24),
         children: [
@@ -67,7 +67,20 @@ class _RegisterViewState extends State<RegisterView> {
                     _username = value!;
                   },
                 ),
-                
+                TextFormField(
+                  decoration: const InputDecoration(
+                    labelText: 'Email',
+                  ),
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return 'Masukkan Email';
+                    }
+                    return null;
+                  },
+                  onSaved: (value) {
+                    _email = value!;
+                  },
+                ),
                 const SizedBox(height: 10.0),
                 TextFormField(
                   decoration: const InputDecoration(
@@ -129,11 +142,12 @@ class _RegisterViewState extends State<RegisterView> {
       await _userController.registerUser(
         UserRegisterModel(
           username: _username,
+          email: _email,
           password: _password,
         ),
       );
 
-      await SharedPrefUtils.saveUserData(_username);
+      await SharedPrefUtils.saveUserData(_username,_email);
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(

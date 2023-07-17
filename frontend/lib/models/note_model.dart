@@ -1,5 +1,3 @@
-
-
 class NotesModel {
   final int? id_notes;
   final int? id_user;

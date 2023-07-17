@@ -13,13 +13,18 @@ class _HomePageState extends State<HomePage> {
   String? email;
   int? idUser;
 
+  @override
+  void initState() {
+    super.initState();
+    readSharedPrefs();
+  }
+
   Future<void> readSharedPrefs() async {
     final String? usernamePref = await SharedPrefUtils.readUsername();
 
     final int? IdUserPref = await SharedPrefUtils.readIdUser();
     setState(() {
       username = usernamePref;
-
       idUser = IdUserPref;
     });
   }
@@ -40,19 +45,41 @@ class _HomePageState extends State<HomePage> {
               const SizedBox(
                 height: 50.0,
               ),
-              ListTile(
-                contentPadding: const EdgeInsets.symmetric(horizontal: 30),
-                title: Text(
-                  'Hi $username!',
-                  style: Theme.of(context)
-                      .textTheme
-                      .headlineSmall
-                      ?.copyWith(color: Colors.white),
-                ),
-
-                trailing: const CircleAvatar(
-                  radius: 30,
-                  backgroundImage: AssetImage('assets/iconbocchi.jpg'),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Hi $username',
+                      style: TextStyle(
+                          fontSize: 30,
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.pushNamed(context, '/addImage');
+                      },
+                      child: FutureBuilder(
+                        future: SharedPrefUtils.readNameImage(),
+                        builder: (context, snapshot) {
+                          return Container(
+                            width: 60,
+                            height: 60,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              image: DecorationImage(
+                                image: snapshot.data == null
+                                    ? const AssetImage('assets/image-1.png')
+                                    : AssetImage('assets/${snapshot.data}.png'),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(
@@ -97,8 +124,9 @@ class _HomePageState extends State<HomePage> {
                 ),
                 IconButton(
                   onPressed: () {
+                    SharedPrefUtils.saveIsLoggedIn(false);
                     Navigator.pushNamedAndRemoveUntil(
-                        context, '/login', (route) => false);
+                        context, '/', (route) => false);
                   },
                   icon: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -108,7 +136,9 @@ class _HomePageState extends State<HomePage> {
                         Icons.arrow_forward,
                         size: 24.0,
                       ),
-                      SizedBox(height: 10,),
+                      SizedBox(
+                        height: 10,
+                      ),
                       Text(
                         "Sign Out",
                         style: TextStyle(fontSize: 16.0),
@@ -116,7 +146,6 @@ class _HomePageState extends State<HomePage> {
                     ],
                   ),
                 )
-
               ],
             ),
           ),
